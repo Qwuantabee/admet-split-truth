@@ -53,20 +53,27 @@ turned out to be. A ratio of 1.3 means the protocol was pessimistic.
 Protocols: `random`, `scaffold`, `butina`, `time` (within-history time split), and
 `frontier` (structural frontier, per Zheng 2026) where the data support it.
 
-## What the pilot already showed (feasibility, not the result)
+## What the committed pilot showed (feasibility, not the result)
 
-RF on 2048-bit ECFP4, 80 trees, single seed, 3 endpoints, one run:
+`results/smoke.json` is the pilot that is in the repo: 2 endpoints x 2 model families x
+5 protocols, 20 cells, single seed, log10 analysis units. Random split, random forest:
 
 | endpoint | retrospective MAE | prospective MAE | ratio |
 |---|---|---|---|
-| LogD | 0.425 | 0.637 | **0.67** |
-| KSOL | 55.03 | 90.86 | **0.61** |
-| MLM CLint | 373.1 | 311.1 | **1.20** |
+| LogD | 0.43 | 0.64 | **0.68** |
+| KSOL | 0.36 | 0.51 | **0.70** |
 
-**The sign of the bias flips by endpoint.** Two endpoints flatter the model and one
-punishes it. That is the finding worth publishing: a single "multiply your CV error by
-1.5" correction is wrong, and the direction is not predictable from the endpoint name.
-This must survive the full grid before it is claimed.
+**The direction of the bias is a property of the protocol, not of the endpoint.** The
+random split was optimistic on both endpoints, while the within-history time split was
+not: its median ratio over the four time cells is 1.00. A single "multiply your CV error
+by 1.5" correction is therefore the wrong shape of answer, but two endpoints and one
+seed settle nothing - which is what made the full grid worth running.
+
+An earlier version of this section quoted a three-endpoint pilot in raw assay units
+(LogD 0.425/0.637, KSOL 55.03/90.86, MLM CLint 373.1/311.1). That run's artefact is not
+committed and its numbers cannot be recomputed from anything in the repo, so the table
+above is the pilot that can be: `scripts/audit_claims.py` now checks these four values
+and the cell count against `results/smoke.json`.
 
 ## Data (verified against the files, 2026-11-17)
 

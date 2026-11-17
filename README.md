@@ -1,5 +1,8 @@
 # Does your validation split predict the next batch of compounds?
 
+[![tests](https://github.com/Qwuantabee/admet-split-truth/actions/workflows/tests.yml/badge.svg)](https://github.com/Qwuantabee/admet-split-truth/actions/workflows/tests.yml)
+[![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+
 **On a real lead-optimisation program with a time-ordered public split, a random split
 under-states the error on the compounds made next by a factor of 0.76, and a Murcko
 scaffold split by 0.84. Both are measured against the truth, not against each other.**
@@ -199,9 +202,15 @@ python scripts/audit_claims.py
 pytest tests/
 ```
 
+`requirements.txt` is pinned to the versions this suite passes on (Python 3.12).
 The audit is also a test, so CI fails on a stale number as well as a broken function.
 The tests fetch the two source CSVs (under 1 MB together) on first run. Without
 PyTorch installed, the two tests that fit the graph network are skipped.
+
+Runtime: `run_grid.py` took 19 minutes of wall clock on a 12-core CPU (it uses every
+core) and peaked at 1.4 GB of memory. A rerun reproduced `results/grid.json` to about
+12 significant figures; the last digits differ with thread scheduling, so the files
+are not byte-identical. `run_gnn_grid.py` was not timed.
 
 ## Limits, stated plainly
 
@@ -241,6 +250,18 @@ PyTorch installed, the two tests that fit the graph network are skipped.
   spanned 1.0, that would have shipped as the finding. Three do span it, and they are
   reported that way.
 
+## Corrections kept in the history
+
+Numbers here have been wrong, and each was corrected in place rather than dropped.
+The limits section said two of the five intervals span 1.0; three do. "For two endpoints
+the model never beats the training-mean floor" was false — the forest beats the MLM
+CLint floor, and the 15 flagged cells are 3 fits counted once per protocol. A
+prospective MAE quoted as 0.27 is 0.26, and scaffold splitting closes about a third of
+the gap to 1.0, not half. One test asserted an exception the loader cannot raise and was
+fixed with its reason (`tests/test_invariants.py`). `scripts/audit_claims.py` exists
+because prose numbers drifted from the tables they came from; it now binds every number
+to the phrase in front of it, so the same drift fails CI.
+
 ## Layout
 
 ```
@@ -258,3 +279,17 @@ tests/                      time-order invariant, protocol invariants, the GNN's
 
 MIT licence for this repository's own code. The ExpansionRx data keeps its own terms
 (CC-BY-4.0).
+
+## Part of a set
+
+Six repos, one method: take the number a field reports, measure what a practitioner uses, publish
+the gap.
+
+- admet-split-truth: does a validation split predict error on the next compounds?
+- [mlip-fidelity](https://github.com/Qwuantabee/mlip-fidelity): do ML potentials rank near-degenerate conformers correctly?
+- [epistasis-ceiling](https://github.com/Qwuantabee/epistasis-ceiling): do single-mutant effects add up on a double mutant?
+- [variant-effect-prediction](https://github.com/Qwuantabee/variant-effect-prediction): does a cleaner assay target help zero-shot ESM-2?
+- [single-cell-de](https://github.com/Qwuantabee/single-cell-de): are cells replicates?
+- [enzyme-kinetics](https://github.com/Qwuantabee/enzyme-kinetics): how wrong is a Lineweaver-Burk Km?
+
+Overview: https://github.com/Qwuantabee
