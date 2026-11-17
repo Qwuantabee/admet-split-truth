@@ -3,6 +3,9 @@
 **On a real lead-optimisation program with a time-ordered public split, a random split
 under-states the error on the compounds made next by a factor of 0.76, and a Murcko
 scaffold split by 0.84. Both are measured against the truth, not against each other.**
+(Those two numbers are the ridge + random-forest grid below. Adding a third model family
+— a graph network — leaves the random-split figure at 0.76 and moves scaffold to 0.80; a
+random split is the only protocol the new family does not soften.)
 
 ![Retrospective vs prospective error by protocol](figures/ratio_by_protocol.png)
 
@@ -88,6 +91,46 @@ endpoints the model never beats it: **HLM CLint** (0.42 against a floor of 0.38)
 **MLM CLint** (0.47 against 0.42). Their ratios are reported but should not be read as
 a statement about a working model — there is no working model there to mis-state.
 
+## A third model family, because two fingerprints are not two opinions
+
+Ridge and random forest both read the same 2048-bit ECFP4 vector, so their errors are
+correlated by construction. If the five protocols only flatter fingerprints, two
+families would never show it. A message-passing network that reads the molecular graph
+directly is the cheapest test of that, and it swaps only the estimator — the loader,
+the five protocols and the ratio definition are imported, not rewritten.
+
+| protocol | GNN median ratio | 95% CI | |
+|---|---|---|---|
+| random (GNN) | **0.69** | 0.65–0.87 | excludes 1.0 — optimistic |
+| scaffold (GNN) | 0.71 | 0.66–1.04 | spans 1.0 |
+| butina (GNN) | 0.92 | 0.80–1.11 | calibrated |
+| time (GNN) | 0.98 | 0.84–1.25 | calibrated |
+| frontier (GNN) | 1.18 | 0.84–1.47 | calibrated |
+
+Re-derived over **all three families together** — 9 endpoints × 3 models, 132 cells:
+
+| protocol | all three families | 95% CI | |
+|---|---|---|---|
+| random (all three) | **0.76** | 0.67–0.82 | excludes 1.0 — optimistic |
+| scaffold (all three) | 0.80 | 0.68–0.89 | excludes 1.0 — optimistic |
+| time (all three) | 1.01 | 0.91–1.11 | calibrated |
+| butina (all three) | 1.03 | 0.84–1.11 | calibrated |
+| frontier (all three) | 1.12 | 0.89–1.20 | calibrated |
+
+The headline survives the change of family. A random split is still the most optimistic
+protocol and still excludes 1.0, and the three distance- or time-respecting protocols
+still span it. What does *not* fully survive is the scaffold result: under the GNN alone
+its interval spans 1.0, and the interval only excludes 1.0 once the three families are
+pooled. So the claim "scaffold is optimistic but not calibrated" is a statement about
+fingerprint models that the graph model does not strengthen. The random-split finding is
+the one that holds on every family tested.
+
+**The graph model is not the better predictor.** Prospective MAE is lower for the forest
+on five of the nine endpoints, and the GNN wins on 4 — Caco-2 Papp A>B, HLM CLint, KSOL
+and LogD. Two of its losses are wide: MPPB 0.41 against 0.29, MGMB 0.37 against 0.27.
+The measurement above is therefore not an artefact of a weak new model: a family that
+predicts *less* well is mis-stated by the same protocols in the same direction.
+
 ![Ratio against endpoint sample size](figures/shift_vs_ratio.png)
 
 The obvious alternative explanation for the headline is sample size: perhaps the
@@ -119,6 +162,9 @@ pip install -r requirements.txt
 # the grid (downloads the two CSVs into data/raw on first run)
 python scripts/run_grid.py
 
+# the third family, same protocols and ratio, estimator swapped
+python scripts/run_gnn_grid.py
+
 # figures, then the claim audit and the tests
 python scripts/make_figures.py
 python scripts/audit_claims.py
@@ -136,13 +182,15 @@ The audit is also a test, so CI fails on a stale number as well as a broken func
 - **ID order is treated as time order.** Evidence: the two ID ranges are disjoint and
   strictly ordered, and the dataset card describes the test set as later-stage
   molecules. That is an assumption with support, not a timestamp.
-- **The intervals are over cells, not over programs.** With 9 endpoints and 2 models
+- **The intervals are over cells, not over programs.** With 9 endpoints and 3 models
   from a single program, the 95% bootstrap describes variability across
   endpoint × model combinations, and does not account for between-program variation.
   Treat the intervals as a spread, not a claim about a new program.
-- **Two model families, both fingerprint-based.** Ridge and random forest on 2048-bit
-  ECFP4. A graph neural network might be mis-stated differently by the same protocols;
-  that is untested here and is the obvious next experiment.
+- **Three model families, and the third is deliberately untuned.** One architecture,
+one set of hyper-parameters, fixed seed. It was not searched until it won, so its
+  per-protocol ratios are a fair second opinion but not the best a graph model can do.
+  A tuned GNN could shift these numbers; the direction of the random-split bias is not
+  something tuning is expected to remove.
 - **The frontier protocol uses a sampled similarity estimate** (400 reference
   compounds) to order the folds. It affects fold composition, not correctness, but it
   is an approximation stated rather than hidden.
@@ -155,10 +203,14 @@ The audit is also a test, so CI fails on a stale number as well as a broken func
 ```
 src/admet_split/data.py     loader, time-order verification, log10 scaling, coverage
 src/admet_split/splits.py   the five validation protocols
+src/admet_split/gnn.py      the third family: a message-passing network on the graph
 scripts/run_grid.py         the measurement: retrospective vs prospective MAE
+scripts/run_gnn_grid.py     the same measurement with the graph model swapped in
 scripts/make_figures.py     figures from the committed artefact
 scripts/audit_claims.py     every README number against results/grid.json
-tests/                      time-order invariant, protocol invariants, the claim audit
+                            and results/gnn_grid.json
+tests/                      time-order invariant, protocol invariants, the GNN's
+                            determinism and non-redefinition, the claim audit
 ```
 
 MIT licence for this repository's own code. The ExpansionRx data keeps its own terms

@@ -20,9 +20,10 @@ ROOT = Path(__file__).resolve().parents[1]
 RES = ROOT / "results"
 GRID = RES / "grid.json"
 CSV = RES / "grid.csv"
+GNN = RES / "gnn_grid.json"
 
 # every artefact the README depends on; losing one fails rather than shrinks
-REQUIRED = ("grid.json", "grid.csv")
+REQUIRED = ("grid.json", "grid.csv", "gnn_grid.json")
 
 WINDOW = 60
 NUM = re.compile(r"(?<![\w.])([+\-\u2212]?\d[\d,]*(?:\.\d+)?%?)")
@@ -85,6 +86,12 @@ def main() -> int:
                    r"\*\*\d+ endpoints \u00d7 \d+ model"))
     claims.append(("n models", [str(d["n_models"])], "grid.json n_models",
                    r"\*\*\d+ endpoints \u00d7 \d+ model"))
+    # the headline paragraph states both grids' numbers; each is anchored to its own
+    # phrase so neither can drift behind the other
+    claims.append(("headline scaffold moves to",
+                   [f"{json.loads(GNN.read_text())['protocols_all_families']['scaffold']['median_ratio']:.2f}"],
+                   "gnn_grid.json protocols_all_families.scaffold.median_ratio",
+                   r"and moves scaffold to "))
     claims.append(("n cells", [str(len(rows))], "grid.json len(by_protocol_endpoint)",
                    r"(\d+) cells"))
     claims.append(("cells above floor",
@@ -136,6 +143,54 @@ def main() -> int:
                    [f"{round(100 * cov['Caco-2 Permeability Papp A>B']['test_frac'])}%"],
                    "grid.json coverage Caco-2 Papp test_frac",
                    r"the other way \(\d+% \u2192 "))
+
+    # ---- the third family: GNN alone, then all three re-derived together.
+    # Two anchors per protocol because the README carries two tables; a number that
+    # only exists in one of them cannot be checked by the other.
+    g = json.loads(GNN.read_text())
+    gnn_anchor = {
+        "random": r"\| random \(GNN\) \| \*\*",
+        "scaffold": r"\| scaffold \(GNN\) \| ",
+        "butina": r"\| butina \(GNN\) \| ",
+        "time": r"\| time \(GNN\) \| ",
+        "frontier": r"\| frontier \(GNN\) \| ",
+    }
+    all_anchor = {
+        "random": r"\| random \(all three\) \| \*\*",
+        "scaffold": r"\| scaffold \(all three\) \| ",
+        "butina": r"\| butina \(all three\) \| ",
+        "time": r"\| time \(all three\) \| ",
+        "frontier": r"\| frontier \(all three\) \| ",
+    }
+    for p, v in g["protocols_gnn_only"].items():
+        lo, hi = v["ci95"]
+        claims.append((f"GNN {p} ratio", [f"{v['median_ratio']:.2f}"],
+                       f"gnn_grid.json protocols_gnn_only.{p}.median_ratio",
+                       gnn_anchor[p]))
+        claims.append((f"GNN {p} CI",
+                       [f"{lo:.2f}\u2013{hi:.2f}", f"{lo:.2f}-{hi:.2f}"],
+                       f"gnn_grid.json protocols_gnn_only.{p}.ci95",
+                       gnn_anchor[p]))
+    for p, v in g["protocols_all_families"].items():
+        lo, hi = v["ci95"]
+        claims.append((f"all3 {p} ratio", [f"{v['median_ratio']:.2f}"],
+                       f"gnn_grid.json protocols_all_families.{p}.median_ratio",
+                       all_anchor[p]))
+        claims.append((f"all3 {p} CI",
+                       [f"{lo:.2f}\u2013{hi:.2f}", f"{lo:.2f}-{hi:.2f}"],
+                       f"gnn_grid.json protocols_all_families.{p}.ci95",
+                       all_anchor[p]))
+    claims.append(("GNN cell count", [str(g["n_cells_all"])],
+                   "gnn_grid.json n_cells_all", r"\d+ endpoints \u00d7 3 models, (\d+) cells"))
+    claims.append(("GNN endpoints beaten", [str(g["n_endpoints_gnn_beats_rf"])],
+                   "gnn_grid.json n_endpoints_gnn_beats_rf",
+                   r"the GNN wins on (\d+)"))
+    # the two worst losses, one anchor each, read straight from the head-to-head
+    h2h = {r["endpoint"]: r for r in g["head_to_head_vs_rf"]}
+    for ep, label, anchor in (("MPPB", "MPPB loss", r"MPPB (\d\.\d+) against"),
+                              ("MGMB", "MGMB loss", r"MGMB (\d\.\d+) against")):
+        claims.append((label, [f"{h2h[ep]['gnn_prospective_mae']:.2f}"],
+                       f"gnn_grid.json head_to_head {ep} gnn_prospective_mae", anchor))
 
     # ---- evaluate
     missing = []
