@@ -23,9 +23,8 @@ def test_the_audit_fails_when_a_number_is_wrong(tmp_path):
     """An audit that cannot fail is decoration.
 
     Mutate the headline to a wrong value in a copy of the README and require the
-    audit to reject it. This is the check the sibling repos needed and did not have:
-    their first audit passed every wrong number because it only searched for a
-    substring anywhere in the file.
+    audit to reject it. An audit that only searches for a substring anywhere in the
+    file passes wrong numbers, because the right digits usually appear somewhere.
     """
     readme = (ROOT / "README.md").read_text()
     mutated = readme.replace("| **0.76** |", "| **0.96** |", 1)

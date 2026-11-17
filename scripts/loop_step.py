@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""What is the TRUE next step? Read from disk, never from the ledger.
+"""What is the next step? Decided from which artefacts exist on disk, never from a
+ledger file, so it cannot drift or repeat itself.
 
-Prints JSON: {"step": N, "step_name": ..., "next": ...}. A fire obeys it and does
-nothing else. When the queue is exhausted it returns DONE so the automation can be
-disabled instead of re-reporting finished work.
+Prints JSON: {"step": N, "step_name": ..., "next": ...}. When the queue is exhausted
+it returns DONE rather than re-reporting finished work. The queue is in ROADMAP form
+in LOOP.md.
 """
 from __future__ import annotations
 
@@ -62,10 +63,12 @@ def detect() -> tuple[int, str]:
         return 3, "GNN"
     if not (ROOT / "results" / "second_program.json").exists():
         return 4, "SECOND_PROGRAM"
+    if not (ROOT / "results" / "seeds.json").exists():
+        return 5, "SEEDS"
     if not (ROOT / "results" / "power.json").exists():
-        return 5, "POWER"
+        return 6, "POWER"
     if not (ROOT / "docs" / "METHODS.md").exists():
-        return 6, "DOCS"
+        return 7, "DOCS"
     return 99, "DONE"
 
 
@@ -77,11 +80,13 @@ NEXT = {
            "results/gnn_grid.json",
     "SECOND_PROGRAM": "repeat the measurement on a second public dataset with a "
                       "verified time split",
+    "SEEDS": "repeat the grid over several seeds and fold assignments; every ratio "
+             "is currently a single run",
     "POWER": "smallest endpoint sample size where each protocol's interval "
              "excludes 1.0",
     "DOCS": "write docs/METHODS.md: why a ratio of medians, and the ID-order "
             "assumption",
-    "DONE": "queue exhausted - disable this automation",
+    "DONE": "queue exhausted - nothing further is planned",
 }
 
 

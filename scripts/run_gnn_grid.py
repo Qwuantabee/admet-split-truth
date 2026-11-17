@@ -179,8 +179,7 @@ def main() -> int:
         "head_to_head_vs_rf": head,
         "n_endpoints_gnn_beats_rf": int(n_better),
         "by_protocol_endpoint": t.to_dict(orient="records"),
-        "provenance": "/home/ubuntu/.openclaw/workspace/venv/bin/python "
-                      "scripts/run_gnn_grid.py",
+        "provenance": "python scripts/run_gnn_grid.py",
     }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

@@ -262,8 +262,7 @@ def main() -> int:
         "seeds": 1,
         "note": "retrospective MAE is the median over that protocol's folds inside "
                 "the training period; the future compounds never enter it",
-        "provenance": "/home/ubuntu/.openclaw/workspace/venv/bin/python "
-                      "scripts/run_grid.py",
+        "provenance": "python scripts/run_grid.py",
     }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

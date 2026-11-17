@@ -1,7 +1,12 @@
 # DESIGN — does your validation split predict the next batch of compounds?
 
-Status: feasibility gate PASSED (2026-11-17). Headline number measured on a pilot,
-full grid not yet run.
+Status: the full grid has since been run, and a third model family added. This file is
+the design as it stood before the measurement; the results are in `README.md` and in
+`results/`. Where the two differ, the README is current.
+
+One figure planned here (`calibration_curve.png`) was not built: the two that ship
+carry the finding and the sample-size control, and a third panel of the same data was
+not worth the space.
 
 ## The question
 
@@ -16,7 +21,8 @@ validation protocol mis-state the error on the compounds they make next?**
 ## Why this is not already answered
 
 - Zheng 2026 (arXiv:2607.10729) measures frontier-vs-scaffold inflation
-  (taskwise median 87%, interval 52.1–246.0%) — **retrospective only**. It shows
+  (taskwise median 87.0%; the 52.1–246.0% interval they report is on the
+  skew-sensitive mean of 130.3%, not on that median) — **retrospective only**. It shows
   splits disagree with each other, not which one matches reality.
 - The OpenADMET–ExpansionRx blind challenge (Castellanos 2026,
   ChemRxiv 10.26434/chemrxiv.15009342) reports a leaderboard and notes anecdotally
@@ -62,7 +68,7 @@ punishes it. That is the finding worth publishing: a single "multiply your CV er
 1.5" correction is wrong, and the direction is not predictable from the endpoint name.
 This must survive the full grid before it is claimed.
 
-## Data (verified myself, 2026-11-17)
+## Data (verified against the files, 2026-11-17)
 
 `openadmet/openadmet-expansionrx-challenge-data` on Hugging Face.
 
@@ -121,8 +127,8 @@ is a few CPU-hours. No GPU is required; an optional Chemprop MPNN leg (~0.3M par
 - A null result ships as the result.
 - No number appears in prose that is not in `results/`.
 
-## What this looks like to a hiring manager
+## Who this is for
 
-Computational ADMET / ML modelling scientist who owns **validation methodology** —
-the person a pharma modelling team puts in front of a decision about whether to trust
-a model. The headline is a single ratio with an interval, not a leaderboard climb.
+A modelling team deciding how much to trust an internal validation number before it
+commits synthesis money. The deliverable is a single ratio with an interval and the
+conditions under which it was measured, not a leaderboard climb.
