@@ -41,6 +41,10 @@ def _signed(v: float, fmt: str) -> list[str]:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--readme", default=str(ROOT / "README.md"))
+    ap.add_argument("--strict", action="store_true",
+                    help="fail if any claim is unanchored. Every claim here carries "
+                         "an anchor already, so this is a guard against a future "
+                         "addition that does not, not a different standard.")
     args = ap.parse_args()
 
     readme = Path(args.readme).read_text()
@@ -163,6 +167,10 @@ def main() -> int:
         for label, spellings, source, why in missing:
             print(f"  {label:34s} expected {spellings} ({source}) :: {why}")
         print("\nEither the README is stale or the artefacts changed. Neither ships.")
+        return 1
+    if args.strict and unanchored:
+        print(f"\n{unanchored} claim(s) are not bound to a phrase. In --strict mode a "
+              f"claim that could be satisfied anywhere in the file is not a check.")
         return 1
     print("every published number matches its committed artefact, in place")
     return 0
