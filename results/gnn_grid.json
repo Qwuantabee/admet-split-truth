@@ -730,5 +730,5 @@
       "model_beats_floor": true
     }
   ],
-  "provenance": "/home/ubuntu/.openclaw/workspace/venv/bin/python scripts/run_gnn_grid.py"
+  "provenance": "python scripts/run_gnn_grid.py"
 }
