@@ -3,3 +3,8 @@ data/raw/
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# derived: loop_step.py rewrites this on every check. LOOP.md is explicit that the
+# next step is judged from artefacts on disk, so the ledger is a convenience copy,
+# not a source of truth - tracking it would dirty the tree on every fire.
+LOOP_STATE.json
