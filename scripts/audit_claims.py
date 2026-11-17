@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Check every number the README quotes against results/grid.json.
 
-The sibling repos learned this the hard way: prose is where numbers rot, and an audit
-that only searches for a substring certifies claims it never checked. So each claim
+Prose is where numbers rot, and an audit that only searches for a substring certifies
+claims it never checked: the digits can match somewhere else in the file. So each claim
 here is ANCHORED - it names the phrase that must immediately precede the value - and a
 claim whose anchor no longer exists is a failure, not a silent pass.
 
@@ -80,6 +80,30 @@ def main() -> int:
                        [f"{lo:.2f}\u2013{hi:.2f}", f"{lo:.2f}-{hi:.2f}"],
                        f"grid.json protocols.{p}.ci95",
                        anchors[p]))
+
+    # ---- the headline SENTENCE, not only the table. The table rows were anchored
+    # from the start and the sentence was not, so the two could drift apart: a wrong
+    # "factor of 0.76" passed while the row was right. One anchor each now.
+    claims.append(("headline sentence random",
+                   [f"{prot['random']['median_ratio']:.2f}"],
+                   "grid.json protocols.random.median_ratio",
+                   r"next by a factor of "))
+    claims.append(("headline sentence scaffold",
+                   [f"{prot['scaffold']['median_ratio']:.2f}"],
+                   "grid.json protocols.scaffold.median_ratio",
+                   r"scaffold split by "))
+    claims.append(("headline sentence random, restated with the third family",
+                   [f"{prot['random']['median_ratio']:.2f}"],
+                   "grid.json protocols.random.median_ratio",
+                   r"leaves the random-split figure at "))
+    claims.append(("the percentage the ratio is read as",
+                   [f"{round(100 * (1 - prot['random']['median_ratio']))}%"],
+                   "grid.json 1 - protocols.random.median_ratio",
+                   r"told the team its error was "))
+    claims.append(("scaffold restated in prose",
+                   [f"{prot['scaffold']['median_ratio']:.2f}"],
+                   "grid.json protocols.scaffold.median_ratio",
+                   r"gap to 1\.0 \(" + f"{prot['random']['median_ratio']:.2f}" + r" → "))
 
     # ---- the denominators
     claims.append(("n endpoints", [str(d["n_endpoints"])], "grid.json n_endpoints",
@@ -191,6 +215,30 @@ def main() -> int:
                               ("MGMB", "MGMB loss", r"MGMB (\d\.\d+) against")):
         claims.append((label, [f"{h2h[ep]['gnn_prospective_mae']:.2f}"],
                        f"gnn_grid.json head_to_head {ep} gnn_prospective_mae", anchor))
+        # the forest's side of the same comparison: it is the number that decides who
+        # won, and it was the unanchored half of the sentence
+        claims.append((f"{label}, forest side",
+                       [f"{h2h[ep]['rf_prospective_mae']:.2f}"],
+                       f"gnn_grid.json head_to_head {ep} rf_prospective_mae",
+                       anchor.replace(r"(\d\.\d+)", r"\d\.\d+") + r" "))
+    claims.append(("LogD, the GNN's widest win",
+                   [f"{h2h['LogD']['gnn_prospective_mae']:.2f}"],
+                   "gnn_grid.json head_to_head LogD gnn_prospective_mae",
+                   r"So is its best win: LogD "))
+    claims.append(("LogD, forest side",
+                   [f"{h2h['LogD']['rf_prospective_mae']:.2f}"],
+                   "gnn_grid.json head_to_head LogD rf_prospective_mae",
+                   r"So is its best win: LogD \d\.\d+ against "))
+    # "the forest wins five of nine" is the complement of the stored count, and it is
+    # the sentence a reader takes the verdict from, so it is checked as a number
+    beaten = g["n_endpoints_gnn_beats_rf"]
+    words = {0: "zero", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
+             6: "six", 7: "seven", 8: "eight", 9: "nine"}
+    claims.append(("forest wins the rest",
+                   [words[len(head_eps := [h["endpoint"] for h in g["head_to_head_vs_rf"]])
+                          - beaten], str(len(head_eps) - beaten)],
+                   "gnn_grid.json len(head_to_head) - n_endpoints_gnn_beats_rf",
+                   r"Prospective MAE is lower for the forest\s*\non "))
 
     # ---- evaluate
     missing = []
@@ -213,7 +261,25 @@ def main() -> int:
                             f"anchor matched but window has none of them; "
                             f"first token {got.group(1) if got else 'none'}"))
 
+    # ---- the endpoints the GNN is said to win, by name. A verdict list is a claim
+    # like any other, and a name swapped for another name is not something the
+    # numeric checks above would ever see.
+    short = {"Caco-2 Permeability Papp A>B": "Caco-2 Papp A>B"}
+    won = {short.get(h["endpoint"], h["endpoint"])
+           for h in g["head_to_head_vs_rf"] if h["gnn_better"]}
+    sent = readme[readme.find("the GNN wins on"):]
+    sent = sent[:sent.find(".")]
+    listed = {s.strip() for s in
+              re.split(r",|\band\b", sent.split("—", 1)[-1]) if s.strip()}
+    for name in sorted(won - listed):
+        missing.append((f"GNN winner {name}", [name], "gnn_grid.json gnn_better",
+                        "the artefact says it won; the README list omits it"))
+    for name in sorted(listed - won):
+        missing.append((f"GNN winner {name}", [name], "gnn_grid.json gnn_better",
+                        "listed as a win the artefact does not record"))
+
     total = len(claims)
+    total += len(won)
     print(f"{total - len(missing)}/{total} claims hold in place"
           + (f"; {unanchored} unanchored" if unanchored else
              "; all anchored to a phrase"))
