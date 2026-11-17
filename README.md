@@ -91,6 +91,14 @@ endpoints the model never beats it: **HLM CLint** (0.42 against a floor of 0.38)
 **MLM CLint** (0.47 against 0.42). Their ratios are reported but should not be read as
 a statement about a working model — there is no working model there to mis-state.
 
+![Ratio against endpoint sample size](figures/shift_vs_ratio.png)
+
+The obvious alternative explanation for the headline is sample size: perhaps the
+optimism is just what small endpoints do. The panel above puts every cell's ratio
+against the training-period sample size for that endpoint, and the points scatter
+rather than trending. Sample size is not the explanation, and this figure exists so a
+reader does not have to take that on trust.
+
 ## A third model family, because two fingerprints are not two opinions
 
 Ridge and random forest both read the same 2048-bit ECFP4 vector, so their errors are
@@ -130,14 +138,6 @@ on five of the nine endpoints, and the GNN wins on 4 — Caco-2 Papp A>B, HLM CL
 and LogD. Two of its losses are wide: MPPB 0.41 against 0.29, MGMB 0.37 against 0.27.
 The measurement above is therefore not an artefact of a weak new model: a family that
 predicts *less* well is mis-stated by the same protocols in the same direction.
-
-![Ratio against endpoint sample size](figures/shift_vs_ratio.png)
-
-The obvious alternative explanation for the headline is sample size: perhaps the
-optimism is just what small endpoints do. The panel above puts every cell's ratio
-against the training-period sample size for that endpoint, and the points scatter
-rather than trending. Sample size is not the explanation, and this figure exists so a
-reader does not have to take that on trust.
 
 ## Data
 
