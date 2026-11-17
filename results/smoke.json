@@ -1,0 +1,378 @@
+{
+  "question": "By what factor does each retrospective validation protocol mis-state the error on the compounds made next?",
+  "ratio_definition": "retrospective MAE / prospective MAE, both in the endpoint's analysis unit (log10 for the raw concentration/permeability endpoints)",
+  "n_endpoints": 2,
+  "n_models": 2,
+  "protocols": {
+    "butina": {
+      "median_ratio": 0.9905431434786129,
+      "ci95": [
+        0.7782283147548694,
+        1.0281845745146188
+      ],
+      "n": 4
+    },
+    "frontier": {
+      "median_ratio": 0.9763830575220807,
+      "ci95": [
+        0.8789557432191765,
+        1.1034409300074681
+      ],
+      "n": 4
+    },
+    "random": {
+      "median_ratio": 0.6871165409402495,
+      "ci95": [
+        0.5619135819447432,
+        0.7658372709638583
+      ],
+      "n": 4
+    },
+    "scaffold": {
+      "median_ratio": 0.7853243044928202,
+      "ci95": [
+        0.6534985589000344,
+        0.8356780479144242
+      ],
+      "n": 4
+    },
+    "time": {
+      "median_ratio": 1.0024346462976863,
+      "ci95": [
+        0.8349330936144982,
+        1.0382353221328011
+      ],
+      "n": 4
+    }
+  },
+  "by_protocol_endpoint": [
+    {
+      "endpoint": "LogD",
+      "model": "rf",
+      "protocol": "random",
+      "retrospective_mae": 0.43309481713025655,
+      "prospective_mae": 0.6398804874314785,
+      "ratio": 0.6768370432246293,
+      "n_folds": 5,
+      "train_n": 5039,
+      "test_n": 2270,
+      "prospective_floor_mae": 0.8118616553001129,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "LogD",
+      "model": "rf",
+      "protocol": "scaffold",
+      "retrospective_mae": 0.5116321463385021,
+      "prospective_mae": 0.6398804874314785,
+      "ratio": 0.7995745399148307,
+      "n_folds": 5,
+      "train_n": 5039,
+      "test_n": 2270,
+      "prospective_floor_mae": 0.8118616553001129,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "LogD",
+      "model": "rf",
+      "protocol": "butina",
+      "retrospective_mae": 0.6112850843511239,
+      "prospective_mae": 0.6398804874314785,
+      "ratio": 0.9553113375981531,
+      "n_folds": 5,
+      "train_n": 5039,
+      "test_n": 2270,
+      "prospective_floor_mae": 0.8118616553001129,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "LogD",
+      "model": "rf",
+      "protocol": "time",
+      "retrospective_mae": 0.648893432303477,
+      "prospective_mae": 0.6398804874314785,
+      "ratio": 1.0140853566392953,
+      "n_folds": 5,
+      "train_n": 5039,
+      "test_n": 2270,
+      "prospective_floor_mae": 0.8118616553001129,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "LogD",
+      "model": "rf",
+      "protocol": "frontier",
+      "retrospective_mae": 0.7060703201450227,
+      "prospective_mae": 0.6398804874314785,
+      "ratio": 1.1034409300074681,
+      "n_folds": 1,
+      "train_n": 5039,
+      "test_n": 2270,
+      "prospective_floor_mae": 0.8118616553001129,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "LogD",
+      "model": "ridge",
+      "protocol": "random",
+      "retrospective_mae": 0.3753089484416572,
+      "prospective_mae": 0.6679122208485145,
+      "ratio": 0.5619135819447432,
+      "n_folds": 5,
+      "train_n": 5039,
+      "test_n": 2270,
+      "prospective_floor_mae": 0.8118616553001129,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "LogD",
+      "model": "ridge",
+      "protocol": "scaffold",
+      "retrospective_mae": 0.43647967379622576,
+      "prospective_mae": 0.6679122208485145,
+      "ratio": 0.6534985589000344,
+      "n_folds": 5,
+      "train_n": 5039,
+      "test_n": 2270,
+      "prospective_floor_mae": 0.8118616553001129,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "LogD",
+      "model": "ridge",
+      "protocol": "butina",
+      "retrospective_mae": 0.5197882020351217,
+      "prospective_mae": 0.6679122208485145,
+      "ratio": 0.7782283147548694,
+      "n_folds": 5,
+      "train_n": 5039,
+      "test_n": 2270,
+      "prospective_floor_mae": 0.8118616553001129,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "LogD",
+      "model": "ridge",
+      "protocol": "time",
+      "retrospective_mae": 0.5576620168159802,
+      "prospective_mae": 0.6679122208485145,
+      "ratio": 0.8349330936144982,
+      "n_folds": 5,
+      "train_n": 5039,
+      "test_n": 2270,
+      "prospective_floor_mae": 0.8118616553001129,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "LogD",
+      "model": "ridge",
+      "protocol": "frontier",
+      "retrospective_mae": 0.5870652824810768,
+      "prospective_mae": 0.6679122208485145,
+      "ratio": 0.8789557432191765,
+      "n_folds": 1,
+      "train_n": 5039,
+      "test_n": 2270,
+      "prospective_floor_mae": 0.8118616553001129,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "KSOL",
+      "model": "rf",
+      "protocol": "random",
+      "retrospective_mae": 0.35688916011792976,
+      "prospective_mae": 0.5117453216479149,
+      "ratio": 0.6973960386558699,
+      "n_folds": 5,
+      "train_n": 5128,
+      "test_n": 2170,
+      "prospective_floor_mae": 0.7065463638440186,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "KSOL",
+      "model": "rf",
+      "protocol": "scaffold",
+      "retrospective_mae": 0.39459354749100806,
+      "prospective_mae": 0.5117453216479149,
+      "ratio": 0.7710740690708098,
+      "n_folds": 5,
+      "train_n": 5128,
+      "test_n": 2170,
+      "prospective_floor_mae": 0.7065463638440186,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "KSOL",
+      "model": "rf",
+      "protocol": "butina",
+      "retrospective_mae": 0.5249355313981322,
+      "prospective_mae": 0.5117453216479149,
+      "ratio": 1.0257749493590727,
+      "n_folds": 5,
+      "train_n": 5128,
+      "test_n": 2170,
+      "prospective_floor_mae": 0.7065463638440186,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "KSOL",
+      "model": "rf",
+      "protocol": "time",
+      "retrospective_mae": 0.5313120688710768,
+      "prospective_mae": 0.5117453216479149,
+      "ratio": 1.0382353221328011,
+      "n_folds": 5,
+      "train_n": 5128,
+      "test_n": 2170,
+      "prospective_floor_mae": 0.7065463638440186,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "KSOL",
+      "model": "rf",
+      "protocol": "frontier",
+      "retrospective_mae": 0.4955145485258577,
+      "prospective_mae": 0.5117453216479149,
+      "ratio": 0.9682834948646114,
+      "n_folds": 1,
+      "train_n": 5128,
+      "test_n": 2170,
+      "prospective_floor_mae": 0.7065463638440186,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "KSOL",
+      "model": "ridge",
+      "protocol": "random",
+      "retrospective_mae": 0.4437520251861415,
+      "prospective_mae": 0.579433832761429,
+      "ratio": 0.7658372709638583,
+      "n_folds": 5,
+      "train_n": 5128,
+      "test_n": 2170,
+      "prospective_floor_mae": 0.7065463638440186,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "KSOL",
+      "model": "ridge",
+      "protocol": "scaffold",
+      "retrospective_mae": 0.48422013425764393,
+      "prospective_mae": 0.579433832761429,
+      "ratio": 0.8356780479144242,
+      "n_folds": 5,
+      "train_n": 5128,
+      "test_n": 2170,
+      "prospective_floor_mae": 0.7065463638440186,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "KSOL",
+      "model": "ridge",
+      "protocol": "butina",
+      "retrospective_mae": 0.5957649287971847,
+      "prospective_mae": 0.579433832761429,
+      "ratio": 1.0281845745146188,
+      "n_folds": 5,
+      "train_n": 5128,
+      "test_n": 2170,
+      "prospective_floor_mae": 0.7065463638440186,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "KSOL",
+      "model": "ridge",
+      "protocol": "time",
+      "retrospective_mae": 0.5740937334494841,
+      "prospective_mae": 0.579433832761429,
+      "ratio": 0.9907839359560774,
+      "n_folds": 5,
+      "train_n": 5128,
+      "test_n": 2170,
+      "prospective_floor_mae": 0.7065463638440186,
+      "model_beats_floor": true
+    },
+    {
+      "endpoint": "KSOL",
+      "model": "ridge",
+      "protocol": "frontier",
+      "retrospective_mae": 0.5704425378976508,
+      "prospective_mae": 0.579433832761429,
+      "ratio": 0.9844826201795499,
+      "n_folds": 1,
+      "train_n": 5128,
+      "test_n": 2170,
+      "prospective_floor_mae": 0.7065463638440186,
+      "model_beats_floor": true
+    }
+  ],
+  "coverage": [
+    {
+      "endpoint": "LogD",
+      "train_n": 5039,
+      "test_n": 2270,
+      "train_frac": 0.9461134059331581,
+      "test_frac": 0.9947414548641542
+    },
+    {
+      "endpoint": "KSOL",
+      "train_n": 5128,
+      "test_n": 2170,
+      "train_frac": 0.9628238828389035,
+      "test_frac": 0.950920245398773
+    },
+    {
+      "endpoint": "HLM CLint",
+      "train_n": 3595,
+      "test_n": 767,
+      "train_frac": 0.674990612091626,
+      "test_frac": 0.33610867659947413
+    },
+    {
+      "endpoint": "MLM CLint",
+      "train_n": 4375,
+      "test_n": 1161,
+      "train_frac": 0.8214419827262486,
+      "test_frac": 0.5087642418930762
+    },
+    {
+      "endpoint": "Caco-2 Permeability Papp A>B",
+      "train_n": 2156,
+      "test_n": 1615,
+      "train_frac": 0.40480660908749533,
+      "test_frac": 0.7077125328659071
+    },
+    {
+      "endpoint": "Caco-2 Permeability Efflux",
+      "train_n": 2161,
+      "test_n": 1616,
+      "train_frac": 0.4057453999248967,
+      "test_frac": 0.708150744960561
+    },
+    {
+      "endpoint": "MPPB",
+      "train_n": 1292,
+      "test_n": 454,
+      "train_frac": 0.24258355238452872,
+      "test_frac": 0.19894829097283084
+    },
+    {
+      "endpoint": "MBPB",
+      "train_n": 973,
+      "test_n": 449,
+      "train_frac": 0.1826886969583177,
+      "test_frac": 0.19675723049956179
+    },
+    {
+      "endpoint": "MGMB",
+      "train_n": 221,
+      "test_n": 204,
+      "train_frac": 0.04149455501314307,
+      "test_frac": 0.08939526730937773
+    }
+  ],
+  "seeds": 1,
+  "note": "retrospective MAE is the median over that protocol's folds inside the training period; the future compounds never enter it",
+  "provenance": "/home/ubuntu/.openclaw/workspace/venv/bin/python scripts/run_grid.py"
+}

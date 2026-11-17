@@ -1,0 +1,5 @@
+# the two source CSVs are reproducible from Hugging Face; do not commit them
+data/raw/
+__pycache__/
+*.pyc
+.pytest_cache/

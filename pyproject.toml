@@ -1,0 +1,10 @@
+[project]
+name = "admet-split-truth"
+version = "0.1.0"
+description = "How far each ADMET validation split mis-states the error on the next compounds"
+requires-python = ">=3.10"
+dependencies = ["numpy", "pandas", "scipy", "scikit-learn", "rdkit", "matplotlib"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
