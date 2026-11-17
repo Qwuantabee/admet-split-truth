@@ -3,9 +3,14 @@
 **On a real lead-optimisation program with a time-ordered public split, a random split
 under-states the error on the compounds made next by a factor of 0.76, and a Murcko
 scaffold split by 0.84. Both are measured against the truth, not against each other.**
-(Those two numbers are the ridge + random-forest grid below. Adding a third model family
-— a graph network — leaves the random-split figure at 0.76 and moves scaffold to 0.80; a
-random split is the only protocol the new family does not soften.)
+Those two numbers are the ridge + random-forest grid below. Adding a third model family
+— a graph network — leaves the random-split figure at 0.76 and moves scaffold to 0.80.
+The graph network is **not** the better predictor (the forest has the lower error on the
+next compounds for five of nine endpoints), and a random split flatters it all the same:
+all 27 random-split ratios, across three families and nine endpoints, are below 1.0.
+
+One program, one seed, nine endpoints — read the [limits](#limits-stated-plainly) before
+quoting a number.
 
 ![Retrospective vs prospective error by protocol](figures/ratio_by_protocol.png)
 
@@ -42,25 +47,33 @@ training period and scoring the later compounds. It never enters a retrospective
 | frontier (least similar) | 1.04 | 0.88–1.29 | calibrated |
 
 Medians over **9 endpoints × 2 model families** (ridge on ECFP4 and a random forest on
-ECFP4), 88 cells, 95% percentile bootstrap over the cell ratios.
+ECFP4), 88 cells, 95% percentile bootstrap over the cell ratios. That is 18 ratios per
+protocol and 16 for frontier, where the smallest endpoint (MGMB) has too few compounds
+to form a fold. The two models on one endpoint share their compounds, so the independent
+units are closer to the 9 endpoints than to the 18 ratios — see the limits.
 
 Three things follow.
 
 **The ranking of protocols is the ranking of honesty.** The two protocols most teams
 reach for first — a shuffled split, and scaffold grouping — are exactly the two that
 under-state future error. The three that hold up are the ones that respect either time
-or chemical distance.
+or chemical distance — with the caveat, spelled out in the limits, that two of those
+three also fit on less data.
 
-**Scaffold splitting is better than random, but not calibrated.** It removes roughly
-half the optimism (0.76 → 0.84) and still lands below 1.0 with an interval that
+**Scaffold splitting is better than random, but not calibrated.** It closes about a
+third of the gap to 1.0 (0.76 → 0.84) and still lands below 1.0 with an interval that
 excludes it. "We used scaffold split" is not a warrant that the number transfers.
 
-**A frontier split is not pessimistic here.** Zheng 2026 reports structural-frontier
-evaluation as the most pessimistic protocol, with a taskwise median inflation of 87%.
-On this program it is the *most* calibrated of the five (1.04, interval spanning 1.0).
-That disagreement is reported rather than smoothed: their study measured
-retrospective splits against each other, and this one measures against future data.
-The two questions are not the same, and on this data the answer differs.
+**A frontier split is not pessimistic here — measured against the future.** Zheng 2026
+(arXiv:2607.10729) reports a structural-frontier split inflating error by a taskwise
+median of 87% over a matched scaffold split. Here too the frontier split gives a higher
+error than the scaffold split, but against the later compounds it is not pessimistic at
+all: its ratio is 1.04, interval spanning 1.0. Their study measured retrospective
+splits against each other, and this one measures against future data; the two questions
+are not the same. Two cautions: the frontier here is a simpler construction than theirs
+(lowest fingerprint similarity to a sample of the training period), and it is a single
+fold fitted on one sixth of the endpoint's compounds, so it is the least stable of the
+five rows.
 
 ## Where the bias is largest
 
@@ -78,26 +91,36 @@ The optimism is not uniform. Per-endpoint medians, random split:
 | MGMB | 0.85 | 0.25 |
 | MPPB | 0.94 | 0.29 |
 
-The permeability endpoints — the ones with the largest measured distribution shift
-between periods — are the ones a random split lies about most. That is the mechanism,
-and it is visible without fitting anything: Caco-2 Papp shifts from a training median
-of 9.82 to 3.23 in the test period, and efflux from 1.38 to 4.99.
+The two permeability endpoints are the ones a random split lies about most, and they
+are also the ones whose measured values moved most between periods: Caco-2 Papp shifts
+from a training median of 9.82 to 3.23 in the test period, and efflux from 1.38 to 4.99
+(raw assay units, from the two source CSVs). That is consistent with distribution shift
+driving the optimism. It is not shown to be the mechanism: the ordering is not
+monotone — LogD has the third-lowest ratio without a comparable move in its median —
+and nine endpoints cannot settle it.
 
 ## The honest floor
 
-A protocol that cannot beat "predict the training mean" is not measuring the model.
-Across the 88 cells, **15** have a prospective MAE at or above that floor. For two
-endpoints the model never beats it: **HLM CLint** (0.42 against a floor of 0.38) and
-**MLM CLint** (0.47 against 0.42). Their ratios are reported but should not be read as
-a statement about a working model — there is no working model there to mis-state.
+A model that cannot beat "predict the training mean" on the later compounds is not a
+working model, and a ratio computed on it says little. Across the 88 cells, **15** have
+a prospective MAE at or above that floor. Prospective MAE is one number per
+endpoint × model, so those 15 cells are 3 of the 18 fits, each counted once per
+protocol: both fingerprint models on **HLM CLint** (ridge 0.43 and forest 0.41 against a
+floor of 0.38) and ridge on **MLM CLint** (0.55 against 0.42; the forest does beat it,
+at 0.38). The graph network added below does not change the picture: it edges under the
+HLM floor (0.37) and misses the MLM one (0.57). Ratios for those two endpoints are
+reported, but they describe models that are barely better than a constant.
 
 ![Ratio against endpoint sample size](figures/shift_vs_ratio.png)
 
 The obvious alternative explanation for the headline is sample size: perhaps the
 optimism is just what small endpoints do. The panel above puts every cell's ratio
-against the training-period sample size for that endpoint, and the points scatter
-rather than trending. Sample size is not the explanation, and this figure exists so a
-reader does not have to take that on trust.
+against the training-period sample size for that endpoint. Small endpoints are not the
+optimistic ones: the three smallest sit nearest 1.0, and the lowest ratios belong to
+the two mid-sized permeability endpoints. If anything the ratios drift *down* as
+endpoints get larger, the opposite of what that explanation predicts, though with nine
+endpoints that is a tendency and no test is claimed. The figure exists so a reader does
+not have to take the paragraph on trust.
 
 ## A third model family, because two fingerprints are not two opinions
 
@@ -128,16 +151,20 @@ Re-derived over **all three families together** — 9 endpoints × 3 models, 132
 The headline survives the change of family. A random split is still the most optimistic
 protocol and still excludes 1.0, and the three distance- or time-respecting protocols
 still span it. What does *not* fully survive is the scaffold result: under the GNN alone
-its interval spans 1.0, and the interval only excludes 1.0 once the three families are
-pooled. So the claim "scaffold is optimistic but not calibrated" is a statement about
-fingerprint models that the graph model does not strengthen. The random-split finding is
-the one that holds on every family tested.
+(nine ratios) its interval spans 1.0; it excludes 1.0 for the two fingerprint families
+and for all three pooled. So the claim "scaffold is optimistic but not calibrated" is a
+statement about fingerprint models that the graph model does not strengthen. The
+random-split finding is the one that holds on every family tested: each family's ratio
+is below 1.0 on all nine endpoints.
 
 **The graph model is not the better predictor.** Prospective MAE is lower for the forest
 on five of the nine endpoints, and the GNN wins on 4 — Caco-2 Papp A>B, HLM CLint, KSOL
-and LogD. Two of its losses are wide: MPPB 0.41 against 0.29, MGMB 0.37 against 0.27.
-The measurement above is therefore not an artefact of a weak new model: a family that
-predicts *less* well is mis-stated by the same protocols in the same direction.
+and LogD. Two of its losses are wide: MPPB 0.41 against 0.29, MGMB 0.37 against 0.26.
+So is its best win: LogD 0.43 against 0.64. A 4-to-5 split on one seed, with an untuned
+network, is a mixed result and not a ranking of the two families. What it does show is
+that the optimism of a random split does not depend on which family predicts better: a
+family that wins on some endpoints and loses on others is mis-stated in the same
+direction on all of them.
 
 ## Data
 
@@ -158,6 +185,7 @@ gated** — verified through the HF API and by downloading both files.
 
 ```bash
 pip install -r requirements.txt
+pip install torch            # only for the graph-network leg; CPU is enough
 
 # the grid (downloads the two CSVs into data/raw on first run)
 python scripts/run_grid.py
@@ -172,6 +200,8 @@ pytest tests/
 ```
 
 The audit is also a test, so CI fails on a stale number as well as a broken function.
+The tests fetch the two source CSVs (under 1 MB together) on first run. Without
+PyTorch installed, the two tests that fit the graph network are skipped.
 
 ## Limits, stated plainly
 
@@ -182,12 +212,25 @@ The audit is also a test, so CI fails on a stale number as well as a broken func
 - **ID order is treated as time order.** Evidence: the two ID ranges are disjoint and
   strictly ordered, and the dataset card describes the test set as later-stage
   molecules. That is an assumption with support, not a timestamp.
-- **The intervals are over cells, not over programs.** With 9 endpoints and 3 models
-  from a single program, the 95% bootstrap describes variability across
-  endpoint × model combinations, and does not account for between-program variation.
-  Treat the intervals as a spread, not a claim about a new program.
+- **The intervals are over cells, not over programs, and the cells are not independent.**
+  With 9 endpoints and 3 models from a single program, the 95% bootstrap describes
+  variability across endpoint × model combinations and does not account for
+  between-program variation. It also resamples each ratio as if it were independent,
+  while models fitted to the same endpoint share compounds and a test set, so the
+  intervals are narrower than nine independent endpoints justify. Treat them as a
+  spread, not a claim about a new program.
+- **The protocols do not fit on the same amount of data.** Random, scaffold and Butina
+  folds fit on about four fifths of an endpoint's training compounds. The time protocol
+  is rolling-origin, so its folds fit on between one sixth and five sixths, and the
+  frontier protocol is a single fold fitted on one sixth. Less training data raises
+  retrospective error by itself, which pushes those two ratios upward for a reason that
+  has nothing to do with time or chemical distance. Butina is the clean comparison: same
+  training fraction as random, and its interval spans 1.0.
+- **One seed, one fold assignment.** Every number comes from a single run. There is no
+  repeat over seeds and no shuffled-label control; the only baseline is the
+  predict-the-training-mean floor.
 - **Three model families, and the third is deliberately untuned.** One architecture,
-one set of hyper-parameters, fixed seed. It was not searched until it won, so its
+  one set of hyper-parameters, fixed seed. It was not searched until it won, so its
   per-protocol ratios are a fair second opinion but not the best a graph model can do.
   A tuned GNN could shift these numbers; the direction of the random-split bias is not
   something tuning is expected to remove.
@@ -195,7 +238,7 @@ one set of hyper-parameters, fixed seed. It was not searched until it won, so it
   compounds) to order the folds. It affects fold composition, not correctness, but it
   is an approximation stated rather than hidden.
 - **The null result was a live possibility and did not occur.** Had all five intervals
-  spanned 1.0, that would have shipped as the finding. Two do span it, and they are
+  spanned 1.0, that would have shipped as the finding. Three do span it, and they are
   reported that way.
 
 ## Layout
